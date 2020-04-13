@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  
+  <name>Saxon Extension function library master</name>  
+  <groupId>nl.armatiek.saxon</groupId>
+  <artifactId>saxon-ext-master</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging> 
+  
+  <inceptionYear>2018</inceptionYear>
+
+  <developers>
+    <developer>
+      <name>Maarten Kroon</name>
+      <id>maartenkroon</id>
+      <organization>Armatiek BV</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>    
+  </developers>
+  
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+      <comments>A business-friendly OSS license</comments>
+    </license>
+  </licenses>
+
+  <properties>
+    <compiler.source.version>1.8</compiler.source.version>
+    <compiler.target.version>1.8</compiler.target.version>
+    <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
+    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+    <saxon.ext.version>1.0</saxon.ext.version>
+    <saxon.version>9.8.0-8</saxon.version> 
+    <apache.commons.io.version>2.5</apache.commons.io.version>
+    <apache.commons.lang.version>3.5</apache.commons.lang.version>
+    <apache.commons.text.version>1.6</apache.commons.text.version>
+    <okhttp.version>4.5.0</okhttp.version>
+    <tagsoup.version>1.2.1</tagsoup.version>
+    <slf4j.version>1.7.25</slf4j.version>
+  </properties>
+  
+  <modules>
+    <module>core</module>
+    <module>file</module>
+    <module>httpclient</module>
+    <module>logging</module>
+    <module>wikitext</module>
+    <module>canonicalization</module>
+  </modules>
+  
+  <dependencies>         
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>            
+      <version>${saxon.version}</version>
+      <scope>provided</scope>
+    </dependency>   
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin.version}</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
