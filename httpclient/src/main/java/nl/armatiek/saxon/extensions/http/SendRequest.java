@@ -118,7 +118,7 @@ public class SendRequest extends ExtensionFunctionDefinition {
       NodeInfo requestElem =  unwrapNodeInfo((NodeInfo) arguments[0].head()); 
       String method = requestElem.getAttributeValue("", "method");
       if (StringUtils.isBlank(method)) {
-        throw new XPathException("http:request/@method must be specified", "err:HC005");
+        throw new XPathException("http:request/@method must be specified", "HC005");
       }
       String href = requestElem.getAttributeValue("", "href");
       boolean statusOnly = getBoolean(requestElem.getAttributeValue("", "status-only"), false);
@@ -127,13 +127,13 @@ public class SendRequest extends ExtensionFunctionDefinition {
       String authMethod = requestElem.getAttributeValue("", "auth-method");
       if (StringUtils.isNoneBlank(username)) {
         if (StringUtils.isBlank(password)) {
-          throw new XPathException("http:request/@password must be specified if http:request/@username is specified", "err:HC005");
+          throw new XPathException("http:request/@password must be specified if http:request/@username is specified", "HC005");
         }
         if (StringUtils.isBlank(authMethod)) {
-          throw new XPathException("http:request/@auth-method must be specified if http:request/@username is specified", "err:HC005");
+          throw new XPathException("http:request/@auth-method must be specified if http:request/@username is specified", "HC005");
         }
         if (!authMethod.toLowerCase().equals("basic")) {
-          throw new XPathException("Only authentication method \"Basic\" is supported in http:request/@auth-method", "err:HC005");
+          throw new XPathException("Only authentication method \"Basic\" is supported in http:request/@auth-method", "HC005");
         } 
       }
       boolean sendAuthorization = getBoolean(requestElem.getAttributeValue("", "send-authorization"), false);
@@ -150,7 +150,7 @@ public class SendRequest extends ExtensionFunctionDefinition {
         href = ((StringValue) arguments[1].head()).getStringValue();  
       }
       if (StringUtils.isBlank(href)) {
-        throw new XPathException("href is not specified, not in http:request/@href and not as second function argument", "err:HC005");
+        throw new XPathException("href is not specified, not in http:request/@href and not as second function argument", "HC005");
       }
       
       Sequence bodies = null;
@@ -264,12 +264,12 @@ public class SendRequest extends ExtensionFunctionDefinition {
         
       } catch (InterruptedIOException e) {
         if (e instanceof SocketTimeoutException) {
-          throw new XPathException("Socket timeout exception", "err:HC006");  
+          throw new XPathException("Socket timeout exception", "HC006");  
         } else {
-          throw new XPathException("Call timeout exception", "err:HC006");
+          throw new XPathException("Call timeout exception", "HC006");
         }
       } catch (Exception e) {
-        throw new XPathException("An HTTP error occurred: " + e.getMessage(), "err:HC001");
+        throw new XPathException("An HTTP error occurred: " + e.getMessage(), "HC001");
       }
       
       return new ZeroOrMore<Item>(resultList.toArray(new Item[resultList.size()]));

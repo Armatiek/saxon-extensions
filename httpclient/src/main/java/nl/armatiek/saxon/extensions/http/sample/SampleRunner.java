@@ -15,7 +15,7 @@ public class SampleRunner extends SampleRunnerBase {
   public static void main(String [] args) {
     try {
       SampleRunner runner = new SampleRunner();
-      runner.runSample("post-xml.xsl");
+      runner.runSample("post-x-www-form-urlencoded.xsl");
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }

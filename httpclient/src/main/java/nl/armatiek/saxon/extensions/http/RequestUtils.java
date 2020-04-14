@@ -42,28 +42,31 @@ public class RequestUtils {
       final int bodyCount, final XPathContext context) throws XPathException {
     String mediaTypeAttr = bodyElem.getAttributeValue("", "media-type");
     if (StringUtils.isBlank(mediaTypeAttr)) {
-      throw new XPathException("http:body/@media-type must be specified", "err:HC005");
+      throw new XPathException("http:body/@media-type must be specified", "HC005");
     }
     MediaType mediaType = MediaType.parse(mediaTypeAttr);
     if (mediaType == null) {
-      throw new XPathException("Error parsing http:body/@media-type", "err:HC005");
+      throw new XPathException("Error parsing http:body/@media-type", "HC005");
     }
     String src = bodyElem.getAttributeValue("", "src");
     if (src != null) {
       if (bodyElem.hasChildNodes()) {
-        throw new XPathException("http:body can not have both an attribute \"src\" and child nodes", "err:HC004");
+        throw new XPathException("http:body can not have both an attribute \"src\" and child nodes", "HC004");
       }
       if (AxisTool.getCount(bodyElem.iterateAxis(AxisInfo.ATTRIBUTE)) > 2) {
-        throw new XPathException("The src attribute on the body element is mutually exclusive with all other attribute (except the media-type)", "err:HC004");
+        throw new XPathException("The src attribute on the body element is mutually exclusive with all other attribute (except the media-type)", "HC004");
       }
       if (!src.startsWith("file:")) {
-        throw new XPathException("Only \"file:/\" uris are supported in http:body/@src", "err:HC005");
+        throw new XPathException("Only \"file:/\" uris are supported in http:body/@src", "HC005");
       }
       try {
         File file = Paths.get(new URL(src).toURI()).toFile();
+        if (!file.isFile()) {
+          throw new XPathException("File not found (src: \"" + src + "\", resolved to: \"" + file.getAbsolutePath() + "\")", "HC005");
+        }
         return RequestBody.create(file, mediaType);
       } catch (URISyntaxException | MalformedURLException e) {
-        throw new XPathException("Syntax error in uri in http:body/@src (\"" + src + "\")", "err:HC005");
+        throw new XPathException("Syntax error in uri in http:body/@src (\"" + src + "\")", "HC005");
       }
     }
     
@@ -125,11 +128,11 @@ public class RequestUtils {
       final XPathContext context) throws XPathException {
     String mediaTypeAttr = bodyElem.getAttributeValue("", "media-type");
     if (StringUtils.isBlank(mediaTypeAttr)) {
-      throw new XPathException("http:body/@media-type must be specified", "err:HC005");
+      throw new XPathException("http:body/@media-type must be specified", "HC005");
     }
     MediaType mediaType = MediaType.parse(mediaTypeAttr);
     if (!mediaType.type().equals("multipart")) {
-      throw new XPathException("http:multipart/@media-type must have a \"multipart\" main type", "err:HC004");
+      throw new XPathException("http:multipart/@media-type must have a \"multipart\" main type", "HC004");
     }
     
     String boundary = bodyElem.getAttributeValue("", "boundary");

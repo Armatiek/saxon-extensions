@@ -91,7 +91,7 @@ public class ResponseUtils {
     if (overrideMediaType != null) {
       mediaType = MediaType.parse(overrideMediaType);
       if (mediaType == null) {
-        throw new XPathException("Error parsing media type (\"" + overrideMediaType + "\")", "err:HC005");
+        throw new XPathException("Error parsing media type (\"" + overrideMediaType + "\")", "HC005");
       }
     } else if (specifiedMediaType != null) {
       mediaType = specifiedMediaType;
@@ -128,7 +128,7 @@ public class ResponseUtils {
         builder.close();
         return builder.getCurrentRoot();
       } catch (Exception e) {
-        throw new XPathException("Error parsing the entity content as XML or HTML", "err:HC002");
+        throw new XPathException("Error parsing the entity content as XML or HTML", "HC002");
       }
     default:
       return new Base64BinaryValue(body.bytes()); 
