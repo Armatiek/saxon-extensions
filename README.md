@@ -8,7 +8,7 @@ or writing files or directories.
 
 Namespace: http://expath.org/ns/file
 
-Implementation of the specification: 
+These functions are an implementation of the specification: 
 [EXPath - File Module](http://expath.org/spec/file)
 
 ## EXPath - HTTP Client implementation
@@ -17,21 +17,23 @@ Functions that implement a versatile HTTP client interface for XPath and XQuery,
 
 Namespace: http://expath.org/ns/http-client
 
-Implementation of the specification:
+These functions are an implementation of the specification:
 [EXPath - HTTP Client Module](http://expath.org/spec/http-client) 
 based on the Java HTTP client library [OkHttp](https://square.github.io/okhttp/)
 
 Not implemented:
-
 - Multipart responses (multipart requests are supported)
 - Other authentication methods than "Basic"
 
 Extensions to the specifications:
-
 - Proxy server support via the attributes "http:request/@proxy-host","http:request/@proxy-port", 
 "http:request/@proxy-username", "http:request/@proxy-password"
 - Trust all SSL certificates via the attribute http:request/@trust-all-certs 
 (xs:boolean, default: false())
+
+Remarks:
+- Default timeout (connect/write/read/cal) is 30 seconds (can be changed via http:request/@timeout)
+- Certificate authorities of the host platform are trusted
 
 ## Logging functions
 
