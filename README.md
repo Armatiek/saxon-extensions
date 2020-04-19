@@ -32,7 +32,7 @@ Extensions to the specifications:
 (xs:boolean, default: false())
 
 Remarks:
-- Default timeout (connect/write/read/cal) is 30 seconds (can be changed via http:request/@timeout)
+- Default timeout (connect/write/read/call) is 30 seconds (can be changed via http:request/@timeout)
 - Certificate authorities of the host platform are trusted
 
 ## Logging functions

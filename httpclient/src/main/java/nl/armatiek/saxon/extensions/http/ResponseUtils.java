@@ -11,7 +11,6 @@ import net.sf.saxon.event.Sender;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.expr.parser.ExplicitLocation;
 import net.sf.saxon.lib.ParseOptions;
-import net.sf.saxon.lib.StandardEntityResolver;
 import net.sf.saxon.lib.Validation;
 import net.sf.saxon.om.FingerprintedQName;
 import net.sf.saxon.om.Item;
@@ -84,7 +83,8 @@ public class ResponseUtils {
     return NodeInfoTool.getFirstChildElement(builder.getCurrentRoot());
   }
   
-  public static Item buildResponseContent(final Response response, final XPathContext context, final String overrideMediaType) throws XPathException, IOException {
+  public static Item buildResponseContent(final Response response, final XPathContext context, 
+      final NodeInfo requestElem, final String overrideMediaType) throws XPathException, IOException {
     ResponseBody body = response.body();
     MediaType specifiedMediaType = body.contentType();
     MediaType mediaType = null;
@@ -113,16 +113,20 @@ public class ResponseUtils {
       try {
         TinyBuilder builder = new TinyBuilder(context.getConfiguration().makePipelineConfiguration());
         builder.setStatistics(Statistics.SOURCE_DOCUMENT_STATISTICS);
-        SAXSource source = new SAXSource(new InputSource(body.byteStream()));
+        InputSource inputSource = new InputSource(body.byteStream());
+        inputSource.setSystemId(response.request().url().toString());
+        SAXSource source = new SAXSource(inputSource);
         source.setSystemId(response.request().url().toString());
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setDTDValidationMode(Validation.STRIP);
         parseOptions.setSchemaValidationMode(Validation.STRIP);
         parseOptions.setSpaceStrippingRule(NoElementsSpaceStrippingRule.getInstance());
-        parseOptions.setEntityResolver(new StandardEntityResolver());
+        parseOptions.setEntityResolver(new HttpClientEntityResolver(context, requestElem));
         parseOptions.setLineNumbering(false);
         if (contentType.equals(Type.HTML)) {
           parseOptions.setXMLReader(new Parser());
+        } else {
+          parseOptions.setXIncludeAware(true);
         }
         Sender.send(source, builder, parseOptions);
         builder.close();

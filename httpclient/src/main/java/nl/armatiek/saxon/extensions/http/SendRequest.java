@@ -81,7 +81,7 @@ public class SendRequest extends ExtensionFunctionDefinition {
     return new SendRequestCall();
   }
   
-  private static class SendRequestCall extends ExtensionFunctionCallBase {
+  protected static class SendRequestCall extends ExtensionFunctionCallBase {
         
     private static final int TIMEOUT_DEFAULT = 30;
     
@@ -259,7 +259,7 @@ public class SendRequest extends ExtensionFunctionDefinition {
         
         if (!statusOnly) {
           // Build the response content:
-          resultList.add(ResponseUtils.buildResponseContent(response, context, overrideMediaType));
+          resultList.add(ResponseUtils.buildResponseContent(response, context, requestElem, overrideMediaType));
         }
         
       } catch (InterruptedIOException e) {
