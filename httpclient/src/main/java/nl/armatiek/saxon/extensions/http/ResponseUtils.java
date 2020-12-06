@@ -1,23 +1,46 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.armatiek.saxon.extensions.http;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.transform.sax.SAXSource;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.InputSource;
 
 import net.sf.saxon.event.Sender;
 import net.sf.saxon.expr.XPathContext;
-import net.sf.saxon.expr.parser.ExplicitLocation;
+import net.sf.saxon.expr.parser.Loc;
 import net.sf.saxon.lib.ParseOptions;
 import net.sf.saxon.lib.Validation;
-import net.sf.saxon.om.FingerprintedQName;
+import net.sf.saxon.om.AttributeInfo;
+import net.sf.saxon.om.AttributeMap;
+import net.sf.saxon.om.CodedName;
 import net.sf.saxon.om.Item;
+import net.sf.saxon.om.LargeAttributeMap;
+import net.sf.saxon.om.NamePool;
+import net.sf.saxon.om.NamespaceMap;
 import net.sf.saxon.om.NoElementsSpaceStrippingRule;
 import net.sf.saxon.om.NodeInfo;
+import net.sf.saxon.om.SmallAttributeMap;
 import net.sf.saxon.trans.XPathException;
-import net.sf.saxon.tree.tiny.Statistics;
 import net.sf.saxon.tree.tiny.TinyBuilder;
 import net.sf.saxon.type.BuiltInAtomicType;
 import net.sf.saxon.type.Untyped;
@@ -32,50 +55,50 @@ import okhttp3.ResponseBody;
 
 public class ResponseUtils {
   
-  private static final FingerprintedQName nameResponse = new FingerprintedQName("http", Types.EXT_NAMESPACEURI, "response");
-  private static final FingerprintedQName nameStatus = new FingerprintedQName("", "", "status");
-  private static final FingerprintedQName nameMessage = new FingerprintedQName("", "", "message");
-  private static final FingerprintedQName nameHeader = new FingerprintedQName("http", Types.EXT_NAMESPACEURI, "header");
-  private static final FingerprintedQName nameName = new FingerprintedQName("", "", "name");
-  private static final FingerprintedQName nameValue = new FingerprintedQName("", "", "value");
-  private static final FingerprintedQName nameBody = new FingerprintedQName("http", Types.EXT_NAMESPACEURI, "body");
-  private static final FingerprintedQName nameMediaType = new FingerprintedQName("", "", "media-type");
-  private static final FingerprintedQName nameMethod = new FingerprintedQName("", "", "method");
-  
-  public static NodeInfo buildResponseElement(final Response response, final XPathContext context) throws XPathException {
+  public static NodeInfo buildResponseElement(final Response response, final XPathContext context, 
+      final Fingerprints fingerprints) throws XPathException {
     TinyBuilder builder = new TinyBuilder(context.getConfiguration().makePipelineConfiguration());
-    builder.setStatistics(Statistics.SOURCE_DOCUMENT_STATISTICS); 
+    builder.setStatistics(context.getConfiguration().getTreeStatistics().SOURCE_DOCUMENT_STATISTICS); 
     builder.setLineNumbering(false);
     builder.open();
     builder.startDocument(0);
     
+    NamePool namePool = context.getConfiguration().getNamePool();
+    
+    NamespaceMap nsMap = NamespaceMap.of("http", Types.EXT_NAMESPACEURI);
+    
     // Root element: 
-    builder.startElement(nameResponse, Untyped.getInstance(), ExplicitLocation.UNKNOWN_LOCATION, 0);
-    builder.attribute(nameStatus, BuiltInAtomicType.UNTYPED_ATOMIC, Integer.toString(response.code()), null, 0);
-    builder.attribute(nameMessage, BuiltInAtomicType.UNTYPED_ATOMIC, response.message(), null, 0);
+    ArrayList<AttributeInfo> attrList = new ArrayList<AttributeInfo>();
+    attrList.add(new AttributeInfo(new CodedName(fingerprints.STATUS, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, Integer.toString(response.code()), Loc.NONE, 0));
+    attrList.add(new AttributeInfo(new CodedName(fingerprints.MESSAGE, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, response.message(), Loc.NONE, 0));
+    AttributeMap attrMap = new SmallAttributeMap(attrList);
+    builder.startElement(new CodedName(fingerprints.HTTPCLIENT_RESPONSE, "http", namePool), Untyped.getInstance(), attrMap, nsMap, Loc.NONE, 0);
     
     // Response headers:
     Headers responseHeaders = response.headers();
     for (int i=0; i<responseHeaders.size(); i++) {
-      builder.startElement(nameHeader, Untyped.getInstance(), ExplicitLocation.UNKNOWN_LOCATION, 0);
-      builder.attribute(nameName, BuiltInAtomicType.UNTYPED_ATOMIC, responseHeaders.name(i), null, 0);
-      builder.attribute(nameValue, BuiltInAtomicType.UNTYPED_ATOMIC, responseHeaders.value(i), null, 0);
+      ArrayList<AttributeInfo> hAttrList = new ArrayList<AttributeInfo>();
+      hAttrList.add(new AttributeInfo(new CodedName(fingerprints.NAME, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, responseHeaders.name(i), Loc.NONE, 0));
+      hAttrList.add(new AttributeInfo(new CodedName(fingerprints.VALUE, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, responseHeaders.value(i), Loc.NONE, 0));
+      AttributeMap hAttrMap = new LargeAttributeMap(hAttrList);
+      builder.startElement(new CodedName(fingerprints.HTTPCLIENT_HEADER, "http", namePool), Untyped.getInstance(), hAttrMap, nsMap, Loc.NONE, 0);
       builder.endElement();
     }
     
     // Response body:
-    ResponseBody body = response.body();
-    builder.startElement(nameBody, Untyped.getInstance(), ExplicitLocation.UNKNOWN_LOCATION, 0);
+    ResponseBody body = response.body();    
     MediaType mediaType = body.contentType();
+    ArrayList<AttributeInfo> bAttrList = new ArrayList<AttributeInfo>();
     if (mediaType != null) {
-      builder.attribute(nameMediaType, BuiltInAtomicType.UNTYPED_ATOMIC, mediaType.toString(), null, 0);
-      builder.attribute(nameMethod, BuiltInAtomicType.UNTYPED_ATOMIC, Types.getMethodForMediaType(mediaType), null, 0);
+      bAttrList.add(new AttributeInfo(new CodedName(fingerprints.MEDIATYPE, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, mediaType.toString(), Loc.NONE, 0));
+      bAttrList.add(new AttributeInfo(new CodedName(fingerprints.METHOD, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, Types.getMethodForMediaType(mediaType), Loc.NONE, 0));
     } else {
-      builder.attribute(nameMethod, BuiltInAtomicType.UNTYPED_ATOMIC, "binary", null, 0);
+      bAttrList.add(new AttributeInfo(new CodedName(fingerprints.METHOD, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, "binary", Loc.NONE, 0));
     }
- 
+    AttributeMap bAttrMap = new SmallAttributeMap(bAttrList);
+    builder.startElement(new CodedName(fingerprints.HTTPCLIENT_BODY, "http", namePool), Untyped.getInstance(), bAttrMap, nsMap, Loc.NONE, 0);
     builder.endElement();
-   
+    
     builder.endElement();
     
     builder.endDocument();
@@ -84,7 +107,7 @@ public class ResponseUtils {
   }
   
   public static Item buildResponseContent(final Response response, final XPathContext context, 
-      final NodeInfo requestElem, final String overrideMediaType) throws XPathException, IOException {
+      final NodeInfo requestElem, final String overrideMediaType, Fingerprints fingerprints) throws XPathException, IOException {
     ResponseBody body = response.body();
     MediaType specifiedMediaType = body.contentType();
     MediaType mediaType = null;
@@ -112,8 +135,8 @@ public class ResponseUtils {
     case HTML:
       try {
         TinyBuilder builder = new TinyBuilder(context.getConfiguration().makePipelineConfiguration());
-        builder.setStatistics(Statistics.SOURCE_DOCUMENT_STATISTICS);
-        InputSource inputSource = new InputSource(body.byteStream());
+        builder.setStatistics(context.getConfiguration().getTreeStatistics().SOURCE_DOCUMENT_STATISTICS);
+        InputSource inputSource = new InputSource(new BOMInputStream(body.byteStream()));
         inputSource.setSystemId(response.request().url().toString());
         SAXSource source = new SAXSource(inputSource);
         source.setSystemId(response.request().url().toString());
@@ -121,7 +144,7 @@ public class ResponseUtils {
         parseOptions.setDTDValidationMode(Validation.STRIP);
         parseOptions.setSchemaValidationMode(Validation.STRIP);
         parseOptions.setSpaceStrippingRule(NoElementsSpaceStrippingRule.getInstance());
-        parseOptions.setEntityResolver(new HttpClientEntityResolver(context, requestElem));
+        parseOptions.setEntityResolver(new HttpClientEntityResolver(context, requestElem, fingerprints));
         parseOptions.setLineNumbering(false);
         if (contentType.equals(Type.HTML)) {
           parseOptions.setXMLReader(new Parser());
@@ -131,13 +154,14 @@ public class ResponseUtils {
         Sender.send(source, builder, parseOptions);
         builder.close();
         return builder.getCurrentRoot();
-      } catch (Exception e) {
-        throw new XPathException("Error parsing the entity content as XML or HTML", "HC002");
+      } catch (XPathException e) {
+        e.setErrorCode("HC002");
+        throw e;
       }
     default:
       return new Base64BinaryValue(body.bytes()); 
     }
     
   }
-
+  
 }

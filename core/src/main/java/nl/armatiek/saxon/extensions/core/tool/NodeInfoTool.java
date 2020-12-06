@@ -3,6 +3,7 @@ package nl.armatiek.saxon.extensions.core.tool;
 import net.sf.saxon.om.AxisInfo;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.pattern.NodeKindTest;
+import net.sf.saxon.tree.iter.AxisIterator;
 
 public class NodeInfoTool {
   
@@ -14,5 +15,12 @@ public class NodeInfoTool {
     return prevElement.iterateAxis(AxisInfo.FOLLOWING_SIBLING, NodeKindTest.ELEMENT).next();    
   }
   
-
+  public static int getCount(final AxisIterator iter) {
+    int count = 0;
+    while (iter.next() != null) {
+      count++;
+    }
+    return count;
+  }
+ 
 }

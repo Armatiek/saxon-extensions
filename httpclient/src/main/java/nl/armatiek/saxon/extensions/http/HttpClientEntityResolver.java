@@ -1,22 +1,28 @@
 package nl.armatiek.saxon.extensions.http;
 
-import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.saxon.event.PipelineConfiguration;
 import net.sf.saxon.expr.XPathContext;
-import net.sf.saxon.expr.parser.ExplicitLocation;
+import net.sf.saxon.expr.parser.Loc;
 import net.sf.saxon.lib.StandardEntityResolver;
+import net.sf.saxon.om.AttributeInfo;
+import net.sf.saxon.om.AttributeMap;
 import net.sf.saxon.om.AxisInfo;
 import net.sf.saxon.om.CodedName;
 import net.sf.saxon.om.FingerprintedQName;
 import net.sf.saxon.om.Item;
+import net.sf.saxon.om.LargeAttributeMap;
+import net.sf.saxon.om.NamePool;
+import net.sf.saxon.om.NamespaceMap;
 import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.om.NodeName;
 import net.sf.saxon.om.Sequence;
+import net.sf.saxon.om.SmallAttributeMap;
 import net.sf.saxon.om.TreeModel;
 import net.sf.saxon.om.ZeroOrMore;
 import net.sf.saxon.pattern.NameTest;
@@ -32,26 +38,22 @@ import nl.armatiek.saxon.extensions.http.SendRequest.SendRequestCall;
 
 public class HttpClientEntityResolver extends StandardEntityResolver {
   
-  private static final FingerprintedQName nameRequest = new FingerprintedQName("http", Types.EXT_NAMESPACEURI, "request");
-  private static final FingerprintedQName nameHeader = new FingerprintedQName("http", Types.EXT_NAMESPACEURI, "header");
-  private static final FingerprintedQName nameName = new FingerprintedQName("", "", "name");
-  private static final FingerprintedQName nameValue = new FingerprintedQName("", "", "value");
-  private static final FingerprintedQName nameMethod = new FingerprintedQName("", "", "method");
-  private static final FingerprintedQName nameHref = new FingerprintedQName("", "", "href");
-  private static final FingerprintedQName nameStatusOnly = new FingerprintedQName("", "", "status-only");
-  private static final FingerprintedQName nameOverrideMediaType = new FingerprintedQName("", "", "override-media-type");
-  
   private final XPathContext context;
   private final NodeInfo requestNode;
+  private final NamePool namePool;
+  private final Fingerprints fingerprints;
   
-  public HttpClientEntityResolver(XPathContext context, NodeInfo requestNode) {
-    this.setConfiguration(context.getConfiguration());
+  public HttpClientEntityResolver(XPathContext context, NodeInfo requestNode, Fingerprints fingerprints) {
+    super(context.getConfiguration());
+    // this.setConfiguration(context.getConfiguration());
     this.context = context;
+    this.namePool = context.getConfiguration().getNamePool();
     this.requestNode = requestNode;
+    this.fingerprints = fingerprints;
   }
 
   @Override
-  public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+  public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
     /* Try to find the entity in XML Catalog: */
     InputSource is = super.resolveEntity(publicId, systemId);
     if (is != null) {
@@ -68,7 +70,8 @@ public class HttpClientEntityResolver extends StandardEntityResolver {
         builder.setLineNumbering(false);
         builder.open();
         builder.startDocument(0);
-        builder.startElement(nameRequest, Untyped.getInstance(), ExplicitLocation.UNKNOWN_LOCATION, 0);
+        
+        ArrayList<AttributeInfo> attrList = new ArrayList<AttributeInfo>();
         
         /* Copy relevant attribute nodes: */
         AxisIterator attrs = requestNode.iterateAxis(AxisInfo.ATTRIBUTE);
@@ -84,24 +87,31 @@ public class HttpClientEntityResolver extends StandardEntityResolver {
           } else {
             name = new FingerprintedQName("", "", attr.getLocalPart());
           }
-          builder.attribute(name, BuiltInAtomicType.UNTYPED_ATOMIC, attr.getStringValue(), null, 0);  
+          attrList.add(new AttributeInfo(name, BuiltInAtomicType.UNTYPED_ATOMIC, attr.getStringValue(), Loc.NONE, 0));  
         }
         
         /* Create new attribute nodes specific for this request */
-        builder.attribute(nameMethod, BuiltInAtomicType.UNTYPED_ATOMIC, "GET", null, 0);
-        builder.attribute(nameHref, BuiltInAtomicType.UNTYPED_ATOMIC, systemId, null, 0);
-        builder.attribute(nameStatusOnly, BuiltInAtomicType.UNTYPED_ATOMIC, "false", null, 0);
-        builder.attribute(nameOverrideMediaType, BuiltInAtomicType.UNTYPED_ATOMIC, "text/plain", null, 0);
+        attrList.add(new AttributeInfo(new CodedName(fingerprints.METHOD, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, "GET", Loc.NONE, 0));
+        attrList.add(new AttributeInfo(new CodedName(fingerprints.HREF, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, systemId, Loc.NONE, 0));
+        attrList.add(new AttributeInfo(new CodedName(fingerprints.STATUSONLY, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, "false", Loc.NONE, 0));
+        attrList.add(new AttributeInfo(new CodedName(fingerprints.OVERRIDEMEDIATYPE, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, "text/plain", Loc.NONE, 0));
         
-        builder.startContent();
+        AttributeMap attrMap = new LargeAttributeMap(attrList);
+        
+        NamespaceMap nsMap = NamespaceMap.of("http", Types.EXT_NAMESPACEURI);
+        builder.startElement(new CodedName(fingerprints.HTTPCLIENT_REQUEST, "http", namePool), Untyped.getInstance(), attrMap, nsMap, Loc.NONE, 0);
+        
+        // builder.startContent();
 
         /* Copy all header elements: */
         AxisIterator headers = requestNode.iterateAxis(AxisInfo.CHILD, new NameTest(Type.ELEMENT, Types.EXT_NAMESPACEURI, "header", context.getConfiguration().getNamePool()));
         NodeInfo header;
         while ((header = headers.next()) != null) {
-          builder.startElement(nameHeader, Untyped.getInstance(), ExplicitLocation.UNKNOWN_LOCATION, 0);
-          builder.attribute(nameName, BuiltInAtomicType.UNTYPED_ATOMIC, header.getAttributeValue("", "name"), null, 0);  
-          builder.attribute(nameValue, BuiltInAtomicType.UNTYPED_ATOMIC, header.getAttributeValue("", "value"), null, 0);  
+          ArrayList<AttributeInfo> hAttrList = new ArrayList<AttributeInfo>();
+          hAttrList.add(new AttributeInfo(new CodedName(fingerprints.NAME, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, header.getAttributeValue("", "name"), Loc.NONE, 0));  
+          hAttrList.add(new AttributeInfo(new CodedName(fingerprints.VALUE, "", namePool), BuiltInAtomicType.UNTYPED_ATOMIC, header.getAttributeValue("", "value"), Loc.NONE, 0));  
+          AttributeMap hAttrMap = new SmallAttributeMap(hAttrList);
+          builder.startElement(new CodedName(fingerprints.HTTPCLIENT_HEADER, "http", namePool), Untyped.getInstance(), hAttrMap, nsMap, Loc.NONE, 0);
           builder.endElement();
         }    
         builder.endElement();
@@ -124,14 +134,12 @@ public class HttpClientEntityResolver extends StandardEntityResolver {
           inputSource.setSystemId(systemId);
           return inputSource;
         }
-        throw new IOException("Error executing HTTP request \"" + systemId + "\" (status: " + status + ", message: " + responseNode.getAttributeValue("", "message") + ")");
+        throw new SAXException("Error executing HTTP request \"" + systemId + "\" (status: " + status + ", message: " + responseNode.getAttributeValue("", "message") + ")");
       } catch (XPathException e) {
-        throw new IOException("Error executing HTTP request \"" + systemId + "\"", e);
+        throw new SAXException("Error executing HTTP request \"" + systemId + "\"", e);
       }
     }
     return null;
   }
   
-  
-
 }

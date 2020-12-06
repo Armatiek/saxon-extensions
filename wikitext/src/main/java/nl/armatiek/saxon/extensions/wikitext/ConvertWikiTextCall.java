@@ -31,7 +31,7 @@ public class ConvertWikiTextCall extends ExtensionFunctionCall {
       html = StringEscapeUtils.unescapeHtml4(html);
       ParseXml parseXml = new ParseXml();
       parseXml.setRetainedStaticContext(new RetainedStaticContext(context.getConfiguration()));
-      return new ZeroOrOne<NodeInfo>(parseXml.call(context, new Sequence[] {new StringValue(html)}));
+      return parseXml.call(context, new Sequence[] {new StringValue(html)});
     } catch (Exception e) {
       throw new XPathException("Error converting " + language.getName() + " to HTML", e);
     }       

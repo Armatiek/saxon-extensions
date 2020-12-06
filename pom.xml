@@ -9,7 +9,7 @@
   <name>Saxon Extension function library master</name>  
   <groupId>nl.armatiek.saxon</groupId>
   <artifactId>saxon-ext-master</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <packaging>pom</packaging> 
   
   <inceptionYear>2018</inceptionYear>
@@ -39,11 +39,11 @@
     <compiler.target.version>1.8</compiler.target.version>
     <project.build.sourceEncoding>${file.encoding}</project.build.sourceEncoding>
     <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-    <saxon.ext.version>1.0</saxon.ext.version>
-    <saxon.version>9.8.0-8</saxon.version> 
-    <apache.commons.io.version>2.5</apache.commons.io.version>
-    <apache.commons.lang.version>3.5</apache.commons.lang.version>
-    <apache.commons.text.version>1.6</apache.commons.text.version>
+    <saxon.ext.version>1.1</saxon.ext.version>
+    <saxon.version>10.3</saxon.version> 
+    <apache.commons.io.version>2.8.0</apache.commons.io.version>
+    <apache.commons.lang.version>3.11</apache.commons.lang.version>
+    <apache.commons.text.version>1.9</apache.commons.text.version>
     <okhttp.version>4.5.0</okhttp.version>
     <tagsoup.version>1.2.1</tagsoup.version>
     <slf4j.version>1.7.25</slf4j.version>

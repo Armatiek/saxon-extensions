@@ -1,7 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.armatiek.saxon.extensions.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -9,6 +27,9 @@ import java.nio.file.Paths;
 
 import javax.xml.transform.OutputKeys;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 
 import net.sf.saxon.expr.XPathContext;
@@ -25,7 +46,6 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.Base64BinaryValue;
 import net.sf.saxon.value.StringValue;
-import nl.armatiek.saxon.extensions.core.tool.AxisTool;
 import nl.armatiek.saxon.extensions.core.tool.NodeInfoTool;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -53,7 +73,7 @@ public class RequestUtils {
       if (bodyElem.hasChildNodes()) {
         throw new XPathException("http:body can not have both an attribute \"src\" and child nodes", "HC004");
       }
-      if (AxisTool.getCount(bodyElem.iterateAxis(AxisInfo.ATTRIBUTE)) > 2) {
+      if (NodeInfoTool.getCount(bodyElem.iterateAxis(AxisInfo.ATTRIBUTE)) > 2) {
         throw new XPathException("The src attribute on the body element is mutually exclusive with all other attribute (except the media-type)", "HC004");
       }
       if (!src.startsWith("file:")) {
@@ -64,7 +84,16 @@ public class RequestUtils {
         if (!file.isFile()) {
           throw new XPathException("File not found (src: \"" + src + "\", resolved to: \"" + file.getAbsolutePath() + "\")", "HC005");
         }
-        return RequestBody.create(file, mediaType);
+        if (Types.isXmlType(mediaTypeAttr)) {
+          /* Remove any BOM's: */
+          try (InputStream is = new BOMInputStream(FileUtils.openInputStream(file))) {
+            return RequestBody.create(IOUtils.toByteArray(is), mediaType);
+          } catch (IOException ioe) {
+            throw new XPathException("Error creating request body", ioe);
+          }  
+        } else {
+          return RequestBody.create(file, mediaType);
+        }
       } catch (URISyntaxException | MalformedURLException e) {
         throw new XPathException("Syntax error in uri in http:body/@src (\"" + src + "\")", "HC005");
       }
@@ -78,7 +107,8 @@ public class RequestUtils {
     
     if (method.equals("xml") || method.equals("xhtml")) {
       ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
-      Serializer ser = ((Processor) context.getConfiguration().getProcessor()).newSerializer(baos);
+      Processor processor = new Processor(context.getConfiguration());
+      Serializer ser = processor.newSerializer(baos);
       
       // Set serialization parameters:
       String val;
@@ -100,7 +130,7 @@ public class RequestUtils {
       try {
         ser.serializeNode(new XdmNode(nodeInfo));
       } catch (SaxonApiException sae) {
-        throw new XPathException("Error serializing body: " + sae.getMessage(), sae);
+        throw new XPathException("Error serializing request body: " + sae.getMessage(), sae);
       }
       return RequestBody.create(baos.toByteArray(), mediaType);
     } else if (method.equals("text") || method.equals("html")) {
@@ -120,7 +150,7 @@ public class RequestUtils {
       }
       return RequestBody.create(value, mediaType);
     } else {
-      throw new XPathException("Unsupported method \"" + method + "\"");
+      throw new XPathException("Unsupported method \"" + method + "\"", "HC005");
     }
   }
   
