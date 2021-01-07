@@ -75,3 +75,24 @@ Function for the Canonicalization (c14n) of XML.
 Namespace: http://www.armatiek.com/saxon/functions/canonicalization
 
 - c14n:canonicalize-xml($xml as xs:string) as xs:string
+
+
+## Using the Extension functions
+
+### Command line
+
+`mvn package`
+
+Create a saxon configuration file and add functions to use. 
+
+```config.xml
+<configuration xmlns="http://saxon.sf.net/ns/configuration" edition="HE">
+    <resources>
+      <extensionFunction>nl.armatiek.saxon.extensions.canonicalization.CanonicalizeXML</extensionFunction>
+   </resources>
+</configuration>
+```
+
+```
+java -cp saxon.jar:file/canonicalization/saxon-ext-canonicalization-1.1-uber.jar net.sf.saxon.Transform  -config:config.xml -s:input.xml -xsl:test.xsl -o:test2.xml
+```
