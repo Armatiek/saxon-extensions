@@ -93,6 +93,23 @@ Create a saxon configuration file and add functions to use.
 </configuration>
 ```
 
+```input.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<_/>
 ```
-java -cp saxon.jar:file/canonicalization/saxon-ext-canonicalization-1.1-uber.jar net.sf.saxon.Transform  -config:config.xml -s:input.xml -xsl:test.xsl -o:test2.xml
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:c14n="http://www.armatiek.com/saxon/functions/canonicalization"
+    exclude-result-prefixes="xs"
+    version="3.0">    
+    <xsl:template name="saxon-extensions">
+        <xsl:sequence select="c14n:canonicalize-xml('&lt;_/>')"/>
+    </xsl:template>
+</xsl:stylesheet>
+```
+
+```
+java -cp saxon.jar:canonicalization/target/saxon-ext-canonicalization-1.1-uber.jar net.sf.saxon.Transform  -config:config.xml -it:saxon-extensions -xsl:test.xsl -o:output.xml
 ```
