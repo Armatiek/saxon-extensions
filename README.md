@@ -85,6 +85,7 @@ Namespace: http://www.armatiek.com/saxon/functions/canonicalization
 
 Create a saxon configuration file and add functions to use. 
 
+*`config.xml`*
 ```config.xml
 <configuration xmlns="http://saxon.sf.net/ns/configuration" edition="HE">
     <resources>
@@ -92,12 +93,13 @@ Create a saxon configuration file and add functions to use.
    </resources>
 </configuration>
 ```
-
+*`input.xml`*
 ```input.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <_/>
 ```
-```
+`*test.xsl*`
+```test.xsl
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
