@@ -75,3 +75,44 @@ Function for the Canonicalization (c14n) of XML.
 Namespace: http://www.armatiek.com/saxon/functions/canonicalization
 
 - c14n:canonicalize-xml($xml as xs:string) as xs:string
+
+
+## Using the Extension functions
+
+### Command line
+
+`mvn package`
+
+Create a saxon configuration file and add functions to use. 
+
+#### config.xml:
+```config.xml
+<configuration xmlns="http://saxon.sf.net/ns/configuration" edition="HE">
+    <resources>
+      <extensionFunction>nl.armatiek.saxon.extensions.canonicalization.CanonicalizeXML</extensionFunction>
+   </resources>
+</configuration>
+```
+#### input.xml:
+```input.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<_/>
+```
+
+#### test.xsl:
+```test.xsl
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:c14n="http://www.armatiek.com/saxon/functions/canonicalization"
+    exclude-result-prefixes="xs"
+    version="3.0">    
+    <xsl:template name="saxon-extensions">
+        <xsl:sequence select="c14n:canonicalize-xml('&lt;_/>')"/>
+    </xsl:template>
+</xsl:stylesheet>
+```
+
+```
+java -cp saxon.jar:canonicalization/target/saxon-ext-canonicalization-1.1-uber.jar net.sf.saxon.Transform  -config:config.xml -it:saxon-extensions -xsl:test.xsl -o:output.xml
+```
