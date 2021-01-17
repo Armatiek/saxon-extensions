@@ -6,7 +6,9 @@
   
   <modelVersion>4.0.0</modelVersion>
   
-  <name>EXPath - File implementation for the Saxon XSLT processor</name>   
+  <name>${project.groupId}:${project.artifactId}</name>  
+  <description>EXPath - File implementation for the Saxon XSLT processor</description>
+  <url>https://github.com/Armatiek/saxon-extensions</url>
   <artifactId>saxon-ext-file</artifactId>
   <packaging>jar</packaging>
   
@@ -34,6 +36,27 @@
     </dependency> 
   </dependencies>
   
+  <profiles>
+    <profile>
+      <id>no-shade</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+              <execution>
+                <id>shade-execution</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
   <build>
     <plugins>
       <plugin>
@@ -47,11 +70,34 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.7</version>
+        <version>3.2.0</version>
         <configuration>
           <outputDirectory>docs</outputDirectory>
+          <source>8</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
           <show>public</show>
         </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -89,6 +135,7 @@
         </configuration>
         <executions>
           <execution>
+            <id>shade-execution</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>

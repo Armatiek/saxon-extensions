@@ -27,8 +27,8 @@ import net.sf.saxon.value.StringValue;
 
 /**
  * XPath extension function that returns the value of the operating system-specific 
- * line separator, which usually is &#10; on UNIX-based systems, &#13;&#10; on 
- * Windows systems and &#13; on Mac systems.
+ * line separator, which usually is LF on UNIX-based systems, CRLF on 
+ * Windows systems and CR on Mac systems.
  * 
  * @author Maarten Kroon
  * @see <a href="http://expath.org/spec/file">EXPath File Module</a>

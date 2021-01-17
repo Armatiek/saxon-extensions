@@ -6,11 +6,13 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>Saxon Extension function library master</name>  
+  <name>${project.groupId}:${project.artifactId}</name>  
+  <description>Saxon Extension function library master</description>
+  <url>https://github.com/Armatiek/saxon-extensions</url>
   <groupId>nl.armatiek.saxon</groupId>
   <artifactId>saxon-ext-master</artifactId>
   <version>1.1</version>
-  <packaging>pom</packaging> 
+  <packaging>pom</packaging>
   
   <inceptionYear>2018</inceptionYear>
 
@@ -33,6 +35,19 @@
       <comments>A business-friendly OSS license</comments>
     </license>
   </licenses>
+  
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org</url>
+    </repository>
+  </distributionManagement>
+  
+  <scm>
+    <connection>scm:git:git://github.com/Armatiek/saxon-extensions.git</connection>
+    <developerConnection>scm:git:ssh://github.com/Armatiek/saxon-extensions.git</developerConnection>
+    <url>https://github.com/Armatiek/saxon-extensions/tree/master</url>
+  </scm>
 
   <properties>
     <compiler.source.version>1.8</compiler.source.version>
@@ -79,5 +94,41 @@
       </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.7</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
 </project>

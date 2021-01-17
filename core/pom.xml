@@ -6,7 +6,9 @@
   
   <modelVersion>4.0.0</modelVersion>
   
-  <name>Saxon Extension function library core</name>   
+  <name>${project.groupId}:${project.artifactId}</name>  
+  <description>Saxon Extension function library core</description>
+  <url>https://github.com/Armatiek/saxon-extensions</url>   
   <artifactId>saxon-ext-core</artifactId>
   <packaging>jar</packaging>
   
@@ -15,5 +17,42 @@
     <artifactId>saxon-ext-master</artifactId>
     <version>1.1</version>
   </parent>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <outputDirectory>docs</outputDirectory>
+          <source>8</source>
+          <detectJavaApiLink>false</detectJavaApiLink>
+          <show>public</show>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   
 </project>
