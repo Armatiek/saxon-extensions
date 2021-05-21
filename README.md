@@ -55,6 +55,133 @@ The second argument provides serialization parameters. These must be
 supplied as an output:serialization-parameters element, having the format described in
 [Section 3.1 Setting Serialization Parameters by Means of a Data Model Instance](https://www.w3.org/TR/xslt-xquery-serialization-31/#serparams-in-xdm-instance)
 
+## YAML parse and serialization functions
+
+Functions to parse and serialize [https://yaml.org/](YAML). These functions are based on the Java 
+library [https://bitbucket.org/asomov/snakeyaml/wiki/Documentation](SnakeYAML). 
+
+Namespace: http://www.armatiek.com/saxon/functions/yaml
+
+Functions:
+
+- yaml:yaml-to-xml($yaml as xs:string) as document-node()*
+- yaml:yaml-to-xml($yaml as xs:string, $options as map(\*)) as document-node()*
+- yaml:xml-to-yaml($nodes as node()*) as xs:string
+- yaml:xml-to-yaml($nodes as node()*, $options as map(\*)) as xs:string
+
+Options for yaml:yaml-to-xml(), see also [LoaderOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/LoaderOptions.html)
+
+| Name  | Type | Description |
+| --- | --- | --- |
+| allow-duplicate-keys  | xs:boolean  | Allow/Reject duplicate map keys in the YAML file. Default is to allow. |
+| allow-recursive-keys  | xs:boolean  | Allow recursive keys for mappings. By default it is not allowed. |
+| enum-case-sensitive  | xs:boolean  | Disables or enables case sensitivity during construct enum constant from string value Default is false. |
+| max-aliases-for-collections  | xs:integer  | Restrict the amount of aliases for collections (sequences and mappings) to avoid https://en.wikipedia.org/wiki/Billion_laughs_attack |
+| process-comments  | xs:boolean  | Set the comment processing. By default comments are ignored. |
+
+Options for yaml:xml-to-yaml(), see also [DumperOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/DumperOptions.html)
+
+| Name  | Type | Description |
+| --- | --- | --- |
+| allow-unicode          | xs:boolean  | Specify whether to emit non-ASCII printable Unicode characters. The default value is true.  |
+| canonical              | xs:boolean  | Force the emitter to produce a canonical YAML document. |
+| default-flow-style     | ['auto', 'block', 'flow'] |  |
+| default-scalar-style   | ['double_quoted', 'folded', 'literal', 'plain', 'single_quoted'] |  |
+| explicit-end           | xs:boolean  |  |
+| explicit-start         | xs:boolean  |  |
+| indent                 | xs:integer  |  |
+| indent-with-indicator  | xs:boolean  | Set to true to add the indent for sequences to the general indent  |
+| indicator-indent       | xs:integer  | Set number of white spaces to use for the sequence indicator '-' |
+| line-break             | ['mac', 'unix', 'win'] | Specify the line break to separate the lines.  |
+| max-simple-key-length  | xs:integer | Define max key length to use simple key (without '?') More info https://yaml.org/spec/1.1/#id934537 |
+| non-printable-style    | ['binary', 'escape']  | When String contains non-printable characters they will be converted to binary data with the !!binary tag.  |
+| pretty-flow            | xs:boolean | Force the emitter to produce a pretty YAML document when using the flow style.  |
+| split-lines            | xs:boolean | Specify whether to split lines exceeding preferred width for scalars. |
+| tags                   | map(xs:string, xs:string) |  |
+| time-zone              | xs:string eg 'UTC' | Set the timezone to be used for dates. |
+| version                | ['v1_0', 'v1_1'] |  |
+| width                  | xs:integer | Specify the preferred width to emit scalars. |
+
+Example of XML representation of YAML:
+
+Input YAML:
+```yaml
+---
+ doe: "a deer, a female deer"
+ ray: "a drop of golden sun"
+ date: 2001-12-14T21:59:43.10-05:00
+ pi: 3.14159
+ xmas: true
+ french-hens: 3
+ calling-birds:
+   - huey
+   - dewey
+   - louie
+   - fred
+ xmas-fifth-day:
+   calling-birds: four
+   french-hens: 3
+   golden-rings: 5
+   partridges:
+     count: 1
+     location: "a pear tree"
+   turtle-doves: two
+ amount: ~
+ foo: True
+ picture: !!binary |
+  R0lGODdhDQAIAIAAAAAAANn
+  Z2SwAAAAADQAIAAACF4SDGQ
+  ar3xxbJ9p0qa7R0YxwzaFME
+  1IAADs=
+```
+
+Result of yaml:yaml-to-xml:
+```xml
+<map xmlns="http://www.w3.org/2005/xpath-functions">
+   <string key="doe">a deer, a female deer</string>
+   <string key="ray">a drop of golden sun</string>
+   <date key="date">2001-12-15+01:00</date>
+   <number key="pi">3.14159</number>
+   <boolean key="xmas">true</boolean>
+   <integer key="french-hens">3</integer>
+   <array key="calling-birds">
+      <string>huey</string>
+      <string>dewey</string>
+      <string>louie</string>
+      <string>fred</string>
+   </array>
+   <map key="xmas-fifth-day">
+      <string key="calling-birds">four</string>
+      <integer key="french-hens">3</integer>
+      <integer key="golden-rings">5</integer>
+      <map key="partridges">
+         <integer key="count">1</integer>
+         <string key="location">a pear tree</string>
+      </map>
+      <string key="turtle-doves">two</string>
+   </map>
+   <null key="amount"/>
+   <boolean key="foo">true</boolean>
+   <base64Binary key="picture">R0lGODdhDQAIAIAAAAAAANnZ2SwAAAAADQAIAAACF4SDGQar3xxbJ9p0qa7R0YxwzaFME1IAADs=</base64Binary>
+</map>
+```
+
+De following elements/datatypes are supported:
+
+- map
+- array
+- string
+- integer
+- long
+- number
+- float
+- double
+- boolean
+- date
+- dateTime
+- null
+- base64Binary
+
 ## Wikitext functions
 
 Functions for the conversion of several wiki dialects to XHTML.
