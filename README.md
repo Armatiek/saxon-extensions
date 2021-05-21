@@ -57,7 +57,7 @@ supplied as an output:serialization-parameters element, having the format descri
 
 ## YAML parse and serialization functions
 
-Functions to parse and serialize [https://yaml.org/](YAML). These functions are based on the Java 
+Functions to parse and serialize [YAML](https://yaml.org/). These functions are based on the Java 
 library [https://bitbucket.org/asomov/snakeyaml/wiki/Documentation](SnakeYAML). 
 
 Namespace: http://www.armatiek.com/saxon/functions/yaml
