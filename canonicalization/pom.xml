@@ -15,7 +15,7 @@
   <parent>
     <groupId>nl.armatiek.saxon</groupId>
     <artifactId>saxon-ext-master</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
   </parent>
 
   <dependencies>

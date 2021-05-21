@@ -241,5 +241,5 @@ Create a saxon configuration file and add functions to use.
 ```
 
 ```
-java -cp saxon.jar:canonicalization/target/saxon-ext-canonicalization-1.3-uber.jar net.sf.saxon.Transform  -config:config.xml -it:saxon-extensions -xsl:test.xsl -o:output.xml
+java -cp saxon.jar:canonicalization/target/saxon-ext-canonicalization-1.4-uber.jar net.sf.saxon.Transform  -config:config.xml -it:saxon-extensions -xsl:test.xsl -o:output.xml
 ```
