@@ -188,7 +188,10 @@ Functions for the conversion of several wiki dialects to XHTML.
 
 Namespace: http://www.armatiek.com/saxon/functions/wikitext
 
+- wiki:asciidoc-2-html($text as xs:string) as node()?
+- wiki:commonmark-2-html($text as xs:string) as node()?
 - wiki:confluence-2-html($text as xs:string) as node()? 
+- wiki:creole-2-html($text as xs:string) as node()?
 - wiki:markdown-2-html($text as xs:string) as node()? 
 - wiki:mediawiki-2-html($text as xs:string) as node()? 
 - wiki:textile-2-html($text as xs:string) as node()? 

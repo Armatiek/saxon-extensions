@@ -2,7 +2,7 @@ package nl.armatiek.saxon.extensions.wikitext;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.mylyn.wikitext.parser.MarkupParser;
-import org.eclipse.mylyn.wikitext.parser.markup.AbstractMarkupLanguage;
+import org.eclipse.mylyn.wikitext.parser.markup.MarkupLanguage;
 
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.expr.parser.RetainedStaticContext;
@@ -16,12 +16,13 @@ import net.sf.saxon.value.StringValue;
 
 public class ConvertWikiTextCall extends ExtensionFunctionCall {
 
-  private AbstractMarkupLanguage language;
+  private MarkupLanguage language;
   
-  public ConvertWikiTextCall(AbstractMarkupLanguage language) {
+  public ConvertWikiTextCall(MarkupLanguage language) {
     this.language = language;
   }
   
+  @SuppressWarnings("unchecked")
   @Override
   public ZeroOrOne<NodeInfo> call(XPathContext context, Sequence[] arguments) throws XPathException {            
     try {

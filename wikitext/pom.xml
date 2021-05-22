@@ -17,6 +17,10 @@
     <artifactId>saxon-ext-master</artifactId>
     <version>1.4</version>
   </parent>
+  
+  <properties>
+    <mylyn.version>3.0.39</mylyn.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -32,32 +36,47 @@
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.textile</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.markdown</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.tracwiki</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.mediawiki</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.confluence</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.mylyn.docs</groupId>
       <artifactId>org.eclipse.mylyn.wikitext.twiki</artifactId>
-      <version>3.0.37</version>
+      <version>${mylyn.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.mylyn.docs</groupId>
+      <artifactId>org.eclipse.mylyn.wikitext.commonmark</artifactId>
+      <version>${mylyn.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.mylyn.docs</groupId>
+      <artifactId>org.eclipse.mylyn.wikitext.asciidoc</artifactId>
+      <version>${mylyn.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.mylyn.docs</groupId>
+      <artifactId>org.eclipse.mylyn.wikitext.creole</artifactId>
+      <version>${mylyn.version}</version>
     </dependency>
   </dependencies>
   
