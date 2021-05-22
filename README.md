@@ -58,7 +58,7 @@ supplied as an output:serialization-parameters element, having the format descri
 ## YAML parse and serialization functions
 
 Functions to parse and serialize [YAML](https://yaml.org/). These functions are based on the Java 
-library [https://bitbucket.org/asomov/snakeyaml/wiki/Documentation](SnakeYAML). 
+library [SnakeYAML](https://bitbucket.org/asomov/snakeyaml/wiki/Documentation). 
 
 Namespace: http://www.armatiek.com/saxon/functions/yaml
 
@@ -69,7 +69,7 @@ Functions:
 - yaml:xml-to-yaml($nodes as node()*) as xs:string
 - yaml:xml-to-yaml($nodes as node()*, $options as map(\*)) as xs:string
 
-Options for yaml:yaml-to-xml(), see also [LoaderOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/LoaderOptions.html)
+Options for yaml:yaml-to-xml(), see also [LoaderOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/LoaderOptions.html).
 
 | Name  | Type | Description |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ Options for yaml:yaml-to-xml(), see also [LoaderOptions](https://www.javadoc.io/
 | max-aliases-for-collections  | xs:integer  | Restrict the amount of aliases for collections (sequences and mappings) to avoid https://en.wikipedia.org/wiki/Billion_laughs_attack |
 | process-comments  | xs:boolean  | Set the comment processing. By default comments are ignored. |
 
-Options for yaml:xml-to-yaml(), see also [DumperOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/DumperOptions.html)
+Options for yaml:xml-to-yaml(), see also [DumperOptions](https://www.javadoc.io/doc/org.yaml/snakeyaml/latest/org/yaml/snakeyaml/DumperOptions.html).
 
 | Name  | Type | Description |
 | --- | --- | --- |
